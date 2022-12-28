@@ -3,6 +3,7 @@ import xlwt
 from pathlib import Path, PurePath
 
 
+# 合并Excel
 def merge_excel():
     # 指定要合并excel的路径
     src_path = "E:/PythonTest/src"
@@ -15,8 +16,10 @@ def merge_excel():
     # 存放读取结果
     content = []
 
+    # 准备写入文件表头
+    table_header = ['员工姓名', '第一题', '第二题']
     read_excel_data(files, content)
-    write_excel_data(dst_file, content)
+    write_excel_data(dst_file, table_header, content)
 
 
 def read_excel_data(files, content):
@@ -35,9 +38,7 @@ def read_excel_data(files, content):
         print(temp)
 
 
-def write_excel_data(dst_file, content):
-    # 准备写入文件表头
-    table_header = ['员工姓名', '第一题', '第二题']
+def write_excel_data(dst_file, table_header, content):
     workbooks = xlwt.Workbook(encoding='utf-8')
     sheet = workbooks.add_sheet("统计结果")
     # 写入表头
@@ -73,5 +74,42 @@ def write_excel_body(content, sheet):
         row += 1
 
 
+# 获取表头内容
+def get_header(table):
+    colMax = table.ncols
+    header = table.row_values(rowx=0, start_colx=0, end_colx=colMax)
+    print("表头", header)
+    return header
+
+
+# 拆分Excel
+def split_excel():
+    src_file = "E:/PythonTest/拆分目标.xls"
+    dst_src = "E:/PythonTest/splitRes/"
+
+    data = xlrd.open_workbook(src_file)
+    table = data.sheets()[0]
+    employer_number = table.nrows
+    # print(employer_number)
+    table_header = get_header(table)
+    for line in range(1, employer_number):
+        content = table.row_values(rowx=line, start_colx=0, end_colx=None)
+        print(content)
+        workbooks = xlwt.Workbook(encoding='utf-8')
+        sheet = workbooks.add_sheet("统计")
+        # 写入表头
+        write_excel_header(table_header, sheet)
+        # 写入内容
+        row = 1
+        col = 0
+        for cell in content:
+            sheet.write(row, col, cell)
+            col += 1
+
+        # 保存结果
+        workbooks.save(dst_src + content[1] + ".xls")
+
+
 if __name__ == '__main__':
-    merge_excel()
+    # merge_excel()
+    split_excel()
