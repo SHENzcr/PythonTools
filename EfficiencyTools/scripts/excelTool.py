@@ -1,3 +1,5 @@
+# excel工具
+# 合并、拆分
 import xlrd
 import xlwt
 from pathlib import Path, PurePath
